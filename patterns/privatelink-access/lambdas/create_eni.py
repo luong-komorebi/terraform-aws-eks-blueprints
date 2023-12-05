@@ -14,7 +14,7 @@ class StructuredMessage:
         self.kwargs = kwargs
 
     def __str__(self):
-        return '%s >>> %s' % (self.message, json.dumps(self.kwargs))
+        return f'{self.message} >>> {json.dumps(self.kwargs)}'
 
 _ = StructuredMessage # optional, to improve readability
 logger = logging.getLogger(__name__)

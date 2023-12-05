@@ -15,7 +15,7 @@ class StructuredMessage:
         self.kwargs = kwargs
 
     def __str__(self):
-        return '%s >>> %s' % (self.message, json.dumps(self.kwargs))
+        return f'{self.message} >>> {json.dumps(self.kwargs)}'
 
 _ = StructuredMessage # optional, to improve readability
 logger = logging.getLogger(__name__)
@@ -24,7 +24,6 @@ logger.setLevel(logging.DEBUG)
 def handler(event, context):
 
     unhealthyTargetIPAddresses   = []
-    eksApiEndpointEniIPAddresses = []
     unhealthyTargetsToDeregister = []
 
     targetHealthDescriptions = ELBV2_CLIENT.describe_target_health(
@@ -57,11 +56,10 @@ def handler(event, context):
         logger.info("Did not find any EKS API ENIs to compare with, quitting!")
         return
 
-    for networkInterface in networkInterfaces:
-        eksApiEndpointEniIPAddresses.append(
-            networkInterface["PrivateIpAddress"]
-        )
-
+    eksApiEndpointEniIPAddresses = [
+        networkInterface["PrivateIpAddress"]
+        for networkInterface in networkInterfaces
+    ]
     for unhealthyTargetIPAddress in unhealthyTargetIPAddresses:
         if unhealthyTargetIPAddress not in eksApiEndpointEniIPAddresses:
             unhealthyTarget = {
